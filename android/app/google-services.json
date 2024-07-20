@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "78949537577",
+    "project_id": "slash-j0b",
+    "storage_bucket": "slash-j0b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:78949537577:android:66b5aa78f28e998e3a4938",
+        "android_client_info": {
+          "package_name": "com.example.slashjob"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA_PJM0O-BaOvKupBeVgZJfNqH01OULc2s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
