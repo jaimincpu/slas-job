@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-
 import 'common_pop_page_for_detail.dart';
 
 
@@ -23,7 +22,7 @@ class _ITIState extends State<ITI> {
         title: Text('Users with ITI Passed Education'),
       ),
       body: StreamBuilder<QuerySnapshot>(
-        stream: _firestore.collection('users').where('Education detail', isEqualTo: 'ITI passed').snapshots(),
+        stream: _firestore.collection('users').where('Education detail', isEqualTo: 'ITI').snapshots(),
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
             return Center(child: CircularProgressIndicator());

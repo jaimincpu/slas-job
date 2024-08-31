@@ -1,7 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-
-import '../../login/login_page.dart';
+import '../../../login/login_page.dart';
 
 void main() {
   runApp(ContactPage());
@@ -19,8 +18,8 @@ class ContactPage extends StatelessWidget {
           centerTitle: true,
         ),
         textTheme: TextTheme(
-          bodyText1: TextStyle(color: Colors.white),
-          bodyText2: TextStyle(color: Colors.white),
+          bodyLarge: TextStyle(color: Colors.white),
+          bodyMedium: TextStyle(color: Colors.white),
         ),
       ),
       home: UpdateStatus(),

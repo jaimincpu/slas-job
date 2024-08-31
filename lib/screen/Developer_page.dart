@@ -48,7 +48,6 @@ class ProfileScreen extends StatelessWidget {
   }
 }
 
-
 class ProfileTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -88,10 +87,9 @@ class ProfileTile extends StatelessWidget {
                 ),
                 SizedBox(height: 10),
                 SocialMediaButton.linkedin(
-                  onTap: () async {
-                    print('LinkedIn');
-                    await launchUrl(Uri.parse('https://www.linkedin.com/in/jaimin-patel-104999244/'));
-                  },
+                   onTap: () {
+    launch('https://www.linkedin.com/in/jaimin-patel-104999244/');
+  },
                 ),
               ],
             ),
@@ -102,10 +100,4 @@ class ProfileTile extends StatelessWidget {
   }
 }
 
-Future<void> launchUrl(Uri uri) async {
-  if (await canLaunch(uri.toString())) {
-    await launch(uri.toString());
-  } else {
-    throw 'Could not launch $uri';
-  }
-}
+

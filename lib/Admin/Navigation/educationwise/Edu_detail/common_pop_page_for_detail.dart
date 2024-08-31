@@ -1,10 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_pdfview/flutter_pdfview.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
+import 'package:pdfx/pdfx.dart';
+
 
 class UserDetailsPage extends StatelessWidget {
   final String name;
@@ -45,13 +46,12 @@ class UserDetailsPage extends StatelessWidget {
           final String educationDetail = userData['Education detail'] ?? 'N/A';
           final String gender = userData['gender'] ?? 'N/A';
           final String workExperience = userData['workExperience'] ?? 'N/A';
-          final String GovIDurl = userData['GovIDurl'] ?? 'N/A';
+          final String GovIDurl = userData['govIDUrl'] ?? 'N/A';
           final String itiMarkSheetUrl = userData['itiMarkSheetUrl'] ?? 'N/A';
           final String twelfthMarkSheetUrl =
               userData['twelfthMarkSheetUrl'] ?? 'N/A';
           final String pgUgMarkSheetUrl = userData['pgUgMarkSheetUrl'] ?? 'N/A';
-          final String DiplomaMarkSheeturl =
-              userData['DiplomaMarkSheeturl'] ?? 'N/A';
+     //     final String DiplomaMarkSheeturl = userData['DiplomaMarkSheeturl'] ?? 'N/A';
           final String tenMarkSheetUrl = userData['tenMarkSheetUrl'] ?? 'N/A';
            final String regnumber = (userData['REGID'] ?? 'N/A').toString();
 
@@ -173,7 +173,7 @@ class UserDetailsPage extends StatelessWidget {
                             itiMarkSheetUrl: itiMarkSheetUrl,
                             twelfthMarkSheetUrl: twelfthMarkSheetUrl,
                             pgUgMarkSheetUrl: pgUgMarkSheetUrl,
-                            diplomaMarkSheetUrl: DiplomaMarkSheeturl,
+                    //        diplomaMarkSheetUrl: DiplomaMarkSheeturl,
                             tenMarkSheetUrl: tenMarkSheetUrl,
                           ),
                         ),
@@ -213,7 +213,6 @@ class PDFScreen extends StatefulWidget {
   final String itiMarkSheetUrl;
   final String twelfthMarkSheetUrl;
   final String pgUgMarkSheetUrl;
-  final String diplomaMarkSheetUrl;
   final String tenMarkSheetUrl;
 
   PDFScreen({
@@ -221,7 +220,6 @@ class PDFScreen extends StatefulWidget {
     required this.itiMarkSheetUrl,
     required this.twelfthMarkSheetUrl,
     required this.pgUgMarkSheetUrl,
-    required this.diplomaMarkSheetUrl,
     required this.tenMarkSheetUrl,
   });
 
@@ -230,24 +228,20 @@ class PDFScreen extends StatefulWidget {
 }
 
 class _PDFScreenState extends State<PDFScreen> {
-  late Future<File?> _pdfFile;
+  late Future<File?> _govIDFile;
   late Future<File?> _itiMarkSheetFile;
   late Future<File?> _twelfthMarkSheetFile;
   late Future<File?> _pgUgMarkSheetFile;
-  late Future<File?> _diplomaMarkSheetFile;
   late Future<File?> _tenMarkSheetFile;
 
   @override
   void initState() {
     super.initState();
-    _pdfFile = fetchPDF(widget.govIDurl, 'GovID.pdf');
-    _itiMarkSheetFile = fetchPDF(widget.itiMarkSheetUrl, 'itiMarkSheet.pdf');
-    _twelfthMarkSheetFile =
-        fetchPDF(widget.twelfthMarkSheetUrl, 'twelfthMarkSheet.pdf');
-    _pgUgMarkSheetFile = fetchPDF(widget.pgUgMarkSheetUrl, 'pgUgMarkSheet.pdf');
-    _diplomaMarkSheetFile =
-        fetchPDF(widget.diplomaMarkSheetUrl, 'diplomaMarkSheet.pdf');
-    _tenMarkSheetFile = fetchPDF(widget.tenMarkSheetUrl, 'tenMarkSheet.pdf');
+    _govIDFile = fetchPDF(widget.govIDurl, 'GovID.pdf');
+    _itiMarkSheetFile = fetchPDF(widget.itiMarkSheetUrl, 'ITI_MarkSheet.pdf');
+    _twelfthMarkSheetFile = fetchPDF(widget.twelfthMarkSheetUrl, '12th_MarkSheet.pdf');
+    _pgUgMarkSheetFile = fetchPDF(widget.pgUgMarkSheetUrl, 'PG_UG_MarkSheet.pdf');
+    _tenMarkSheetFile = fetchPDF(widget.tenMarkSheetUrl, '10th_MarkSheet.pdf');
   }
 
   Future<File?> fetchPDF(String url, String fileName) async {
@@ -260,9 +254,11 @@ class _PDFScreenState extends State<PDFScreen> {
         await file.writeAsBytes(response.bodyBytes);
         return file;
       } else {
+        print('Failed to download file from $url');
         return null;
       }
     } catch (e) {
+      print('Error fetching PDF: $e');
       return null;
     }
   }
@@ -274,18 +270,11 @@ class _PDFScreenState extends State<PDFScreen> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            FuturePDFViewer(futureFile: _pdfFile, fileName: 'GovID.pdf'),
-            FuturePDFViewer(
-                futureFile: _tenMarkSheetFile, fileName: '10 marksheet'),
-            FuturePDFViewer(
-                futureFile: _diplomaMarkSheetFile,
-                fileName: 'diploma marksheet'),
-            FuturePDFViewer(
-                futureFile: _pgUgMarkSheetFile, fileName: 'PG/UG marksheet'),
-            FuturePDFViewer(
-                futureFile: _twelfthMarkSheetFile, fileName: '12 marksheet'),
-            FuturePDFViewer(
-                futureFile: _itiMarkSheetFile, fileName: 'iti marksheet'),
+            FuturePDFViewer(futureFile: _govIDFile, fileName: 'Government ID'),
+            FuturePDFViewer(futureFile: _tenMarkSheetFile, fileName: '10th Marksheet'),
+            FuturePDFViewer(futureFile: _itiMarkSheetFile, fileName: 'ITI Marksheet'),
+            FuturePDFViewer(futureFile: _twelfthMarkSheetFile, fileName: '12th Marksheet'),
+            FuturePDFViewer(futureFile: _pgUgMarkSheetFile, fileName: 'PG/UG Marksheet'),
           ],
         ),
       ),
@@ -344,48 +333,31 @@ class PDFViewerPage extends StatefulWidget {
 }
 
 class _PDFViewerPageState extends State<PDFViewerPage> {
-  PDFViewController? controller;
-  int pages = 0;
-  int indexPage = 0;
+  late PdfController _pdfController;
+
+  @override
+  void initState() {
+    super.initState();
+    _pdfController = PdfController(
+      document: PdfDocument.openFile(widget.file.path),
+    );
+  }
+
+  @override
+  void dispose() {
+    _pdfController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final text = '${indexPage + 1} of $pages';
-
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
         title: Text(widget.fileName),
-        actions: pages >= 2
-            ? [
-                Center(child: Text(text)),
-                IconButton(
-                  icon: Icon(Icons.chevron_left, size: 32),
-                  onPressed: () {
-                    final page = indexPage == 0 ? pages : indexPage - 1;
-                    controller?.setPage(page);
-                  },
-                ),
-                IconButton(
-                  icon: Icon(Icons.chevron_right, size: 32),
-                  onPressed: () {
-                    final page = indexPage == pages - 1 ? 0 : indexPage + 1;
-                    controller?.setPage(page);
-                  },
-                ),
-              ]
-            : null,
       ),
-      body: Container(
-        height: MediaQuery.of(context).size.height,
-        child: PDFView(
-          filePath: widget.file.path,
-          onRender: (pages) => setState(() => this.pages = pages!),
-          onViewCreated: (controller) =>
-              setState(() => this.controller = controller),
-          onPageChanged: (indexPage, _) =>
-              setState(() => this.indexPage = indexPage!),
-        ),
+      body: PdfView(
+        controller: _pdfController,
       ),
     );
   }

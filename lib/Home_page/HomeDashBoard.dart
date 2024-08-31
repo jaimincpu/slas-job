@@ -1,9 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
-import '../login/login_page.dart';
-import 'Contact/infopage .dart';
+import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
+import 'navgation/Contact/infopage .dart';
 import 'UserData.dart';
 import 'navgation/Company Posts/LsCompanyUserdashboard.dart';
 import 'navgation/updates/update.dart';
@@ -112,32 +111,32 @@ class DashboardScreen extends StatelessWidget {
         ),
         backgroundColor: Color(0xFF27374D),
         centerTitle: true,
-        actions: [
-          IconButton(
-            onPressed: () async {
-              try {
-                // Sign out the user
-                await FirebaseAuth.instance.signOut();
+        // actions: [
+        //   IconButton(
+        //     onPressed: () async {
+        //       try {
+        //         // Sign out the user
+        //         await FirebaseAuth.instance.signOut();
 
-                // Navigate to the login screen (replace with your actual route)
-                Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(builder: (context) => LoginPage()),
-                  (route) => false, // Remove all previous routes from the stack
-                );
-              } catch (e) {
-                // Show an error snackbar
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Error signing out. Please try again.'),
-                    duration: Duration(seconds: 3),
-                  ),
-                );
-              }
-            },
-            icon: Icon(Icons.logout, color: Colors.white),
-          )
-        ],
+        //         // Navigate to the login screen (replace with your actual route)
+        //         Navigator.pushAndRemoveUntil(
+        //           context,
+        //           MaterialPageRoute(builder: (context) => LoginPage()),
+        //           (route) => false, // Remove all previous routes from the stack
+        //         );
+        //       } catch (e) {
+        //         // Show an error snackbar
+        //         ScaffoldMessenger.of(context).showSnackBar(
+        //           SnackBar(
+        //             content: Text('Error signing out. Please try again.'),
+        //             duration: Duration(seconds: 3),
+        //           ),
+        //         );
+        //       }
+        //     },
+        //     icon: Icon(Icons.logout, color: Colors.white),
+        //   )
+        // ],
       ),
       backgroundColor: const Color(0xFFDDE6ED),
       body: StreamBuilder<QuerySnapshot>(

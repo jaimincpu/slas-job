@@ -54,7 +54,7 @@ class _candidateaproveddinedPageState extends State<candidateaproveddinedPage> {
   Future<void> sendEmail(
       String recipientEmail, String subject, String body) async {
     String username = 'slasgroup7381@gmail.com';
-    String password = 'nsabosxeixbbltqh'; // Replace with your actual password
+    String password = 'zdbpbkftivduorru'; // Replace with your actual password
 
     final smtpServer = gmail(username, password);
 

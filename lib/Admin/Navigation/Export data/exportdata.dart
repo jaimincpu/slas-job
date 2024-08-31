@@ -1,9 +1,8 @@
 import 'dart:typed_data';
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:excel/excel.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:firebase_storage/firebase_storage.dart'; // Import Firebase Storage
 
 class ExportData extends StatefulWidget {
   @override
@@ -78,7 +77,7 @@ class _ExportDataState extends State<ExportData> {
 
     for (var i = 0; i < headers.length; i++) {
       var cell = sheetObject.cell(CellIndex.indexByColumnRow(columnIndex: i, rowIndex: 0));
-      cell.value = headers[i];
+      cell.value = headers[i] as CellValue?;
     }
 
     // Fetch and populate data
@@ -102,15 +101,36 @@ class _ExportDataState extends State<ExportData> {
     final List<int> bytes = excel.encode()!;
     final Uint8List uint8listBytes = Uint8List.fromList(bytes);
 
-    // Get the directory to save the file
-    final directory = await getApplicationDocumentsDirectory();
-    final file = File('${directory.path}/UserDetails.xlsx');
+    // Upload the file to Firebase Storage
+    String fileName = 'UserDetails_${DateTime.now().millisecondsSinceEpoch}.xlsx';
+    Reference storageReference = FirebaseStorage.instance.ref().child('export_data/$fileName');
 
-    await file.writeAsBytes(uint8listBytes);
+    try {
+      UploadTask uploadTask = storageReference.putData(uint8listBytes);
+      uploadTask.snapshotEvents.listen((event) {
+        setState(() {
+          _progress = event.bytesTransferred.toDouble() / event.totalBytes.toDouble();
+        });
+      });
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Excel file saved to ${file.path}')),
-    );
+      TaskSnapshot taskSnapshot = await uploadTask;
+      String downloadUrl = await taskSnapshot.ref.getDownloadURL();
+
+      // Store file metadata in Firestore
+      await FirebaseFirestore.instance.collection('export_data').add({
+        'fileName': fileName,
+        'downloadUrl': downloadUrl,
+        'createdAt': Timestamp.now(),
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Excel file uploaded successfully')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error uploading file: $e')),
+      );
+    }
 
     setState(() {
       _isLoading = false;
@@ -186,3 +206,209 @@ class _ExportDataState extends State<ExportData> {
 void main() {
   runApp(MaterialApp(home: ExportData()));
 }
+
+// import 'package:flutter/material.dart';
+// import 'package:cloud_firestore/cloud_firestore.dart';
+// import 'package:excel/excel.dart';
+// import 'package:path_provider/path_provider.dart';
+// import 'dart:io';
+
+// class ExportData extends StatefulWidget {
+//   @override
+//   _ExportDataState createState() => _ExportDataState();
+// }
+
+// class _ExportDataState extends State<ExportData> {
+//   Future<void> fetchAndExportData() async {
+//     try {
+//       // Fetch data from Firestore collection
+//       final QuerySnapshot snapshot = await FirebaseFirestore.instance.collection('users').get();
+
+//       // Create a new Excel document
+//       final Excel excel = Excel.createExcel();
+//       final Sheet sheetObject = excel['UserDetails'];
+
+//       // Define column headers
+//       final List<String> headers = [
+//         'name',
+//         'email',
+//         'phoneNo',
+//         'alterPhoneNo',
+//         'address',
+//         'age',
+//         'gender',
+//         'jobHours',
+//         'workExperience',
+//         'Education detail',
+//       ];
+
+//       // Add headers to Excel sheet
+//       sheetObject.appendRow(headers.cast<CellValue?>());
+
+//       // Add data to Excel
+//       for (final doc in snapshot.docs) {
+//         final Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+//         sheetObject.appendRow([
+//           data['name'] ?? '',
+//           data['email'] ?? '',
+//           data['phoneNo'] ?? '',
+//           data['alterPhoneNo'] ?? '',
+//           data['address'] ?? '',
+//           data['age'] ?? '',
+//           data['gender'] ?? '',
+//           data['jobHours'] ?? '',
+//           data['workExperience'] ?? '',
+//           data['Education detail'] ?? '',
+//         ]);
+//       }
+
+//       // Get app directory and create a folder for the app
+//       final Directory appDocDir = await getApplicationDocumentsDirectory();
+//       final String appDocPath = appDocDir.path;
+//       final String folderPath = '$appDocPath/YourAppName';
+//       await Directory(folderPath).create(recursive: true);
+
+//       // Save the file
+//       final String filePath = '$folderPath/your_data.xlsx';
+//       File(filePath)
+//         ..createSync(recursive: true)
+//         ..writeAsBytesSync(excel.encode()!);
+
+//       // Display a success message to the user
+//       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Data exported successfully to $filePath')));
+//     } catch (e) {
+//       print('Error fetching data: $e');
+//       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to export data')));
+//     }
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(title: Text('Export Data')),
+//       body: Center(
+//         child: ElevatedButton(
+//           onPressed: fetchAndExportData,
+//           child: Text('Export to Excel'),
+//         ),
+//       ),
+//     );
+//   }
+// }
+
+// void main() {
+//   runApp(MaterialApp(home: ExportData()));
+// }
+
+// import 'package:flutter/material.dart';
+// import 'package:cloud_firestore/cloud_firestore.dart';
+// import 'package:syncfusion_flutter_xlsio/xlsio.dart' as xls;
+// import 'package:mailer/mailer.dart';
+// import 'package:mailer/smtp_server.dart';
+// import 'dart:typed_data';
+// import 'dart:io';
+// import 'package:path_provider/path_provider.dart';
+
+// class FirestoreToExcelEmailPage extends StatefulWidget {
+//   @override
+//   _FirestoreToExcelEmailPageState createState() =>
+//       _FirestoreToExcelEmailPageState();
+// }
+
+// class _FirestoreToExcelEmailPageState extends State<FirestoreToExcelEmailPage> {
+//   final String smtpServerAddress = 'smtp.gmail.com';
+//   final String email = 'slasgroup7381@gmail.com';
+//   final String password = 'zdbpbkftivduorru';
+//   final String recipientEmail = 'pateljaimin325@gmail.com';
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: Text('Export Data to Excel'),
+//       ),
+//       body: Center(
+//         child: ElevatedButton(
+//           onPressed: _exportDataAndSendEmail,
+//           child: Text('Export and Send Email'),
+//         ),
+//       ),
+//     );
+//   }
+//   Future<void> _exportDataAndSendEmail() async {
+//     try {
+//       List<Map<String, dynamic>> data = await _fetchDataFromFirestore();
+//       Uint8List excelBytes = _createExcel(data);
+//       await _sendEmailWithAttachment(excelBytes, 'FirestoreData.xlsx');
+//     } catch (e) {
+//       print('Error: $e');
+//     }
+//   }
+
+//   Future<List<Map<String, dynamic>>> _fetchDataFromFirestore() async {
+//     QuerySnapshot querySnapshot =
+//         await FirebaseFirestore.instance.collection('users').get();
+//     return querySnapshot.docs
+//         .map((doc) => doc.data() as Map<String, dynamic>)
+//         .toList();
+//   }
+
+//   Uint8List _createExcel(List<Map<String, dynamic>> data) {
+//     final workbook = xls.Workbook();
+//     final worksheet = workbook.worksheets[0];
+
+//     // Adding column headers
+//     if (data.isNotEmpty) {
+//       List<String> headers = data.first.keys.toList();
+//       for (int i = 0; i < headers.length; i++) {
+//         worksheet.getCell(0, i).value = headers[i];
+//       }
+
+//       // Adding rows with data
+//       for (int rowIndex = 0; rowIndex < data.length; rowIndex++) {
+//         final row = data[rowIndex];
+//         for (int colIndex = 0; colIndex < headers.length; colIndex++) {
+//           final header = headers[colIndex];
+//           worksheet.getCell(rowIndex + 1, colIndex).value = row[header]?.toString() ?? '';
+//         }
+//       }
+//     }
+
+//     final List<int> bytes = workbook.saveAsStream();
+//     workbook.dispose();
+
+//     return Uint8List.fromList(bytes);
+//   }
+
+//   Future<void> _sendEmailWithAttachment(Uint8List excelBytes, String fileName) async {
+//     final smtpServer = SmtpServer(smtpServerAddress,
+//         username: email,
+//         password: password);
+
+//     final directory = await getApplicationDocumentsDirectory();
+//     final file = File('${directory.path}/$fileName');
+//     await file.writeAsBytes(excelBytes);
+
+//     final message = Message()
+//       ..from = Address(email, 'Firestore Data Service')
+//       ..recipients.add(recipientEmail)
+//       ..subject = 'Firestore Data Excel Sheet'
+//       ..text = 'Please find the attached Excel sheet containing the Firestore data.'
+//       ..attachments.add(
+//         FileAttachment(file),
+//       );
+
+//     try {
+//       final sendReport = await send(message, smtpServer);
+//       print('Message sent: ' + sendReport.toString());
+//     } on MailerException catch (e) {
+//       print('Message not sent. \n${e.toString()}');
+//     }
+//   }
+// }
+
+// void main() {
+//   runApp(MaterialApp(
+//     home: FirestoreToExcelEmailPage(),
+//   ));
+// }

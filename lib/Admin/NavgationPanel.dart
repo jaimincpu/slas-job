@@ -36,14 +36,6 @@ class _NavPanelState extends State<NavPanel> {
         actions: [
           Row(
             children: [
-                IconButton(
-            onPressed: () {
-              // Navigator.of(context).push(MaterialPageRoute(
-              //   builder: (_) => const (),
-              // ));
-            },
-            icon: const Icon(Icons.search),
-          ),
               IconButton(
                 icon: TweenAnimationBuilder(
                   tween: Tween<double>(begin: 0, end: 1),
@@ -123,14 +115,6 @@ class _NavPanelState extends State<NavPanel> {
                             ),
                             _buildTextTile(
                               context,
-                              'Reject Candidate',
-                              Icons.cancel,
-                              () {
-                                // Define action for reject candidate button
-                              },
-                            ),
-                            _buildTextTile(
-                              context,
                               'Old Post',
                               Icons.archive,
                               () {
@@ -147,7 +131,10 @@ class _NavPanelState extends State<NavPanel> {
                               () {
                                 Navigator.push(
                                   context,
-                                  MaterialPageRoute(builder: (context) =>ExportData()),
+                                  MaterialPageRoute(builder: (context) =>
+                                  ExportData
+                                 // FirestoreToExcelEmailPage
+                                 ()),
                                 );
                               },
                             ),
@@ -188,14 +175,6 @@ class _NavPanelState extends State<NavPanel> {
                                   context,
                                   MaterialPageRoute(builder: (context) => CompanyListPage()),
                                 );
-                              },
-                            ),
-                            _buildTextTile(
-                              context,
-                              'Approval Candidate',
-                              Icons.check_circle,
-                              () {
-                                // Define action for approval candidate button
                               },
                             ),
                           ],

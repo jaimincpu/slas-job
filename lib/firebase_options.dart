@@ -64,7 +64,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '78949537577',
     projectId: 'slash-j0b',
     storageBucket: 'slash-j0b.appspot.com',
-    iosBundleId: 'com.example.slashjob',
+    iosBundleId: 'com.job.slashjob',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
@@ -73,7 +73,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '78949537577',
     projectId: 'slash-j0b',
     storageBucket: 'slash-j0b.appspot.com',
-    iosBundleId: 'com.example.slashjob',
+    iosBundleId: 'com.job.slashjob',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(

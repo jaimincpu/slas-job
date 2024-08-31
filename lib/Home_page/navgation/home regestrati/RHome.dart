@@ -43,27 +43,27 @@ class _RHomeState extends State<RHome> {
           _profilePhoto = profilePhoto;
         });
       } else {
-        _showSnackBar('File size exceeds 5 MB or no file selected.');
+        _showSnackBar('File size exceeds 1 MB or no file selected.');
       }
     }
   }
 
-  bool _checkFileSize(String path, {int sizeLimit = 5048576}) {
+  bool _checkFileSize(String path, {int sizeLimit = 1000000}) {
     var file = File(path);
     var fileSize = file.lengthSync();
     return fileSize <= sizeLimit;
   }
 
   Future<void> _pickDocument(Function(File?) onPicked,
-      {int sizeLimit = 4000000}) async {
-    final result = await FilePicker.platform.pickFiles(
-        type: FileType.custom, allowedExtensions: ['pdf']);
+      {int sizeLimit = 1500000}) async {
+    final result = await FilePicker.platform
+        .pickFiles(type: FileType.custom, allowedExtensions: ['pdf']);
     if (result != null && result.files.single.path != null) {
       final file = File(result.files.single.path!);
       if (file.lengthSync() <= sizeLimit) {
         onPicked(file);
       } else {
-        _showSnackBar('File size exceeds 4 MB or no file selected.');
+        _showSnackBar('File size exceeds 1.5 MB or no file selected.');
       }
     }
   }
@@ -138,7 +138,6 @@ class _RHomeState extends State<RHome> {
             .doc(user.uid)
             .update(dataToUpdate);
         _showSnackBar('Data saved successfully!');
-        
 
 // Navigate to the login page
         Navigator.pushAndRemoveUntil(
@@ -178,7 +177,7 @@ class _RHomeState extends State<RHome> {
       children: [
         file != null
             ? Text('$label selected: ${file.path.split('/').last}')
-            : Text('No $label selected, only PDF or images are allowed.'),
+            : Text('No $label selected, only PDF are allowed.'),
         SizedBox(height: 8.0),
         ElevatedButton(
           onPressed: enabled ? onPick : null,
@@ -194,7 +193,11 @@ class _RHomeState extends State<RHome> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('User Form'),
+        backgroundColor: Color(0xFF27374D), // Set your desired background color
+        title: Text(
+          'User Form',
+          style: TextStyle(color: Colors.white),
+        ),
         actions: [
           IconButton(
             onPressed: () async {
@@ -212,10 +215,11 @@ class _RHomeState extends State<RHome> {
                 _showSnackBar('Error signing out: $e');
               }
             },
-            icon: Icon(Icons.logout),
+            icon: Icon(Icons.logout, color: Colors.white,),
           ),
         ],
       ),
+        backgroundColor: Color(0xFFDDE6ED),
       body: Stack(
         children: [
           Padding(
@@ -329,6 +333,10 @@ class _RHomeState extends State<RHome> {
                     ),
                     Padding(
                       padding: const EdgeInsets.all(8.0),
+                      child: Text("Please select the experienced "),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
                       child: ToggleSwitch(
                         initialLabelIndex: _selectedEXPOption,
                         labels: ['Fresher', 'Experienced'],
@@ -364,6 +372,10 @@ class _RHomeState extends State<RHome> {
                           },
                         ),
                       ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text("Please select the Job Hours"),
+                    ),
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: ToggleSwitch(

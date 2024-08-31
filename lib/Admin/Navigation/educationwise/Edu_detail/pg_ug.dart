@@ -23,7 +23,7 @@ class _PGUGState extends State<PGUG> {
         title: Text('Users with UG/PG Passed Education'),
       ),
       body: StreamBuilder<QuerySnapshot>(
-        stream: _firestore.collection('users').where('Education detail', isEqualTo: 'ug/pg passed').snapshots(),
+        stream: _firestore.collection('users').where('Education detail', whereIn: ['Graduation', 'Post Graduation']).snapshots(),
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
             return Center(child: CircularProgressIndicator());

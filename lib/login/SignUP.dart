@@ -17,7 +17,7 @@ class _SignUpState extends State<SignUp> {
   final _auth = FirebaseAuth.instance;
   final _firestore = FirebaseFirestore.instance;
   final _formKey = GlobalKey<FormState>();
-  String? _email, _password, _name;
+  String? _email, _password, _confirmPassword, _name;
   final _receivedCodeController = TextEditingController();
   final _verificationService = VerificationService();
   final _regCodeService = RegCodeService();
@@ -193,16 +193,55 @@ class _SignUpState extends State<SignUp> {
                             decoration: InputDecoration(
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(25.0),
-                                borderSide: BorderSide(),
                               ),
                               labelText: 'Password',
                               hintText: 'Enter your password',
                             ),
-                            validator: (input) => input!.length < 6
-                                ? 'Password must be at least 6 characters'
-                                : null,
                             obscureText: true,
-                            onSaved: (input) => _password = input,
+                            validator: (input) {
+                              if (input!.isEmpty) {
+                                return 'Please enter a password';
+                              }
+
+                              RegExp regex = RegExp(
+                                r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$',
+                              );
+
+                              RegExp specialCharRegex = RegExp(r'[!@#\$&*~]');
+
+                              if (!regex.hasMatch(input)) {
+                                return 'Password must contain uppercase, lowercase, digit, special character, and be at least 8 characters long.';
+                              }
+
+                              if (!specialCharRegex.hasMatch(input)) {
+                                return 'Password must include at least one special character (e.g., !, @, #, \$, &, *, ~).';
+                              }
+
+                              _password = input;
+                              return null;
+                            },
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: TextFormField(
+                            decoration: InputDecoration(
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(25.0),
+                              ),
+                              labelText: 'Confirm Password',
+                              hintText: 'Enter your password again',
+                            ),
+                            obscureText: true,
+                            validator: (input) {
+                              if (input!.isEmpty) {
+                                return 'Please confirm your password';
+                              } else if (input != _password) {
+                                return 'Passwords do not match';
+                              }
+                              return null;
+                            },
+                            onSaved: (input) => _confirmPassword = input,
                           ),
                         ),
                         Padding(
@@ -351,7 +390,7 @@ class VerificationService {
 
   Future<void> sendVerification(String email) async {
     String username = 'slasgroup7381@gmail.com';
-    String password = 'nsabosxeixbbltqh';
+    String password = 'zdbpbkftivduorru';
 
     final smtpServer = gmail(username, password);
 

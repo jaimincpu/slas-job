@@ -1,7 +1,4 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-
-import '../../../login/login_page.dart';
 
 void main() {
   runApp(update());
@@ -33,32 +30,32 @@ class UpdateStatus extends StatelessWidget {
         ),
         backgroundColor: primaryColor,
         centerTitle: true,
-        actions: [
-          IconButton(
-            onPressed: () async {
-              try {
-                // Sign out the user
-                await FirebaseAuth.instance.signOut();
+        // actions: [
+        //   IconButton(
+        //     onPressed: () async {
+        //       try {
+        //         // Sign out the user
+        //         await FirebaseAuth.instance.signOut();
 
-                // Navigate to the login screen (replace with your actual route)
-                Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(builder: (context) => LoginPage()),
-                  (route) => false, // Remove all previous routes from the stack
-                );
-              } catch (e) {
-                // Show an error snackbar
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Error signing out. Please try again.'),
-                    duration: Duration(seconds: 3),
-                  ),
-                );
-              }
-            },
-            icon: Icon(Icons.logout, color: textColor),
-          )
-        ],
+        //         // Navigate to the login screen (replace with your actual route)
+        //         Navigator.pushAndRemoveUntil(
+        //           context,
+        //           MaterialPageRoute(builder: (context) => LoginPage()),
+        //           (route) => false, // Remove all previous routes from the stack
+        //         );
+        //       } catch (e) {
+        //         // Show an error snackbar
+        //         ScaffoldMessenger.of(context).showSnackBar(
+        //           SnackBar(
+        //             content: Text('Error signing out. Please try again.'),
+        //             duration: Duration(seconds: 3),
+        //           ),
+        //         );
+        //       }
+        //     },
+        //     icon: Icon(Icons.logout, color: textColor),
+        //   )
+        // ],
       ),
       body: Center(
         child: Container(

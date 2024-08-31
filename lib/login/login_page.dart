@@ -8,6 +8,7 @@ import '../Home_page/log_check/HomeCheck.dart';
 import '../screen/Developer_page.dart';
 import 'Forget_psw.dart';
 import 'SignUP.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'auth.service/authservice.dart';
 
 class LoginPage extends StatelessWidget {
@@ -62,7 +63,7 @@ class _LoginState extends State<Login> {
 
   @override
   Widget build(BuildContext context) {
-       final screenWidth = MediaQuery.of(context).size.width;
+    final screenWidth = MediaQuery.of(context).size.width;
 
     // Define your base font size
     final baseFontSize = 50.0;
@@ -144,7 +145,7 @@ class _LoginState extends State<Login> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) =>ForgetPsw(),
+                          builder: (context) => ForgetPsw(),
                         ),
                       );
                     },
@@ -271,7 +272,27 @@ class _LoginState extends State<Login> {
                       ),
                     ),
                   ),
-                )
+                ),
+                SizedBox(height: 10),
+                InkWell(
+                  onTap: () {
+                    launch(
+                        'https://jaimincpu.github.io/slas_Job_terms-condation/');
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Center(
+                      child: Text(
+                        'Terms & Conditions',
+                        style: TextStyle(
+                          color: Colors.lightBlue,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
               ],
             ),
           ),

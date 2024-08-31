@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
-import '../educationwise/Edu_detail/common_pop_page_for_detail.dart';
 import 'jobapplicationapproved/approvdenied.dart';
 
 class ApplicationListPage extends StatelessWidget {
